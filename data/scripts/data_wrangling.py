@@ -1,3 +1,4 @@
+import copy
 import sys
 
 import pandas as pd
@@ -41,7 +42,7 @@ def remove_original_equals_change(df, key):
 
         return df
 
-def remove_dups(df, key, keep):
+def remove_dups(df, keep):
         """Remove duplicates.
         if keep == 'first' then keep first occurrence
         if keep == False then drop all occurrences """
@@ -73,40 +74,56 @@ healthy_df = pd.read_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_LB_B_Va
 diseased_df = pd.read_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_LP_P_Variants.csv').sort_values(by='AA position').reset_index(drop=True)
 uncertain_df = pd.read_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_Uncertain_Variants.csv').sort_values(by='AA position').reset_index(drop=True)
 
+signal_to_noise_df = pd.read_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_Signal_to_Noise.csv').sort_values(by='AA position').reset_index(drop=True)
+signal_to_noise_df[['AA position', 'Functional Domain']] = signal_to_noise_df[['AA position', 'Functional Domain']].astype(int)
+# print(signal_to_noise_df.head())
+conservation_df = pd.read_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_Conservation_Score.csv').sort_values(by='AA position').reset_index(drop=True)
+# print(conservation_df.head())
+
         
 #Clean the data and add in signal to noise
-dfs = {'healthy': healthy_df, 'pathologic': diseased_df,
+dfs = {'healthy': healthy_df, 'diseased': diseased_df,
                 'uncertain': uncertain_df}
 for key in dfs.keys():
     df = dfs[key]
     print('\n***Working on',key,'***')
     df = check_symbols(df, key)
     df = remove_original_equals_change(df, key)
-    df = remove_dups(df, key, keep='first')
+    df = remove_dups(df, keep='first')
     dfs[key] = df
 
-    # update the variables with clean data
+# update the variables with clean data
 healthy_df = dfs['healthy']
-diseased_df = dfs['pathologic']
+diseased_df = dfs['diseased']
 uncertain_df = dfs['uncertain']
         
-#Merge healthy and diseased
-merged_df = merge_healthy_and_diseased(healthy_df, diseased_df)
-print('merged shape:', merged_df.shape)
-merged_df = remove_dups(merged_df, 'merged', keep=False)
-merged_df = merged_df.sort_values(by='AA position').reset_index(drop=True)
-merged_df = merged_df[['AA position', 'Original', 'Change', 'Label']]
+#Concat healthy and diseased
+print('\n***Merging healthy and diseased***')
+concat_df = merge_healthy_and_diseased(healthy_df, diseased_df)
+print('merged shape:', concat_df.shape)
+concat_df = remove_dups(concat_df, keep=False)
+concat_df = concat_df.sort_values(by='AA position').reset_index(drop=True)
+concat_df = concat_df[['AA position', 'Original', 'Change', 'Label']]
 
+#Merge Signal to Noise Ratio
+merged_df = concat_df.merge(signal_to_noise_df, on='AA position', how='left').sort_values(by='AA position')
+
+#Merge Conservation Score
+merged_df = merged_df.merge(conservation_df, on='AA position', how='left').sort_values(by='AA position')
+
+#Reorder columns
+# merged_df = merged_df.reindex(columns=[['AA position', 'Original', 'Change', 'LQTS/GnomAD', 'Functional Domain', 'Score', 'Label']])
 print(merged_df)
-        
-        # #make sure there are no overlaps between mystery and merged:
-        # #note that duplicates between healthy and sick have been removed
-        # #so those can stay in mysteryAAs (makes sense since if they're listed
-        # #as both healthy and sick we don't know the right answer.)
-        # print('mysteryAAs shape:',self.mysteryAAs.shape)
-        # temp = copy.deepcopy(self.merged).drop(columns='Label')
-        # mystmerged = self.merge_healthy_and_diseased(temp, self.mysteryAAs)
-        # mystmerged = self.remove_dups(mystmerged, 'mystmerged', False, 'duplicate_across_mystery_and_healthysick_removed_both')
-        # self.mysteryAAs = (mystmerged[mystmerged['Label']==1]).drop(columns='Label')
-        # print('mysteryAAs shape after:',self.mysteryAAs.shape)
+
+#Here we make sure there are no overlaps between uncertain and merged:
+#note that duplicates between healthy and diseased have been removed
+#so those can stay in uncertain (makes sense since if they're listed
+#as both healthy and sick we don't know the right answer.)
+
+print('uncertain shape:', uncertain_df.shape)
+temp = copy.deepcopy(merged_df).drop(columns='Label')
+uncertain_merged = merge_healthy_and_diseased(temp, uncertain_df)
+uncertain_merged = remove_dups(uncertain_merged, keep=False)
+uncertain_df = (uncertain_merged[uncertain_merged['Label']==1]).drop(columns='Label')
+print('uncertain shape after:', uncertain_df.shape)
         
