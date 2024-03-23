@@ -61,7 +61,7 @@ def remove_dups(df, keep):
 def merge_healthy_and_diseased(healthy, diseased):
         """Return merged dataframe for healthy and diseased"""
         #add Label column
-        healthy['Label'] = -1
+        healthy['Label'] = 0
         diseased['Label'] = 1
         
         #concat
@@ -113,13 +113,13 @@ merged_df = merged_df.merge(conservation_df, on='AA position', how='left').sort_
 
 #Reorder columns
 # merged_df = merged_df.reindex(columns=[['AA position', 'Original', 'Change', 'LQTS/GnomAD', 'Functional Domain', 'Score', 'Label']])
-print(merged_df)
+print(merged_df.head())
+merged_df.to_csv(config.data + f'/{gene_name}/3. Clean/{gene_name}_dataset.csv')
 
 #Here we make sure there are no overlaps between uncertain and merged:
 #note that duplicates between healthy and diseased have been removed
 #so those can stay in uncertain (makes sense since if they're listed
 #as both healthy and sick we don't know the right answer.)
-
 print('uncertain shape:', uncertain_df.shape)
 temp = copy.deepcopy(merged_df).drop(columns='Label')
 uncertain_merged = merge_healthy_and_diseased(temp, uncertain_df)
