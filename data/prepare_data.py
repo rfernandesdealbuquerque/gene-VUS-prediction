@@ -24,7 +24,7 @@ class PrepareData(object):
         X = pd.get_dummies(X, drop_first=True, dtype=int)
         y = df['Label']
         
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=123, stratify=y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=config.seed, stratify=y)
 
         self.X_train = X_train
         self.X_test = X_test

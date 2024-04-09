@@ -1,12 +1,13 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
 
 
 #####################################################################
 # Grid Search - Calculate Performance Across Different Model Setups #-----------
 #####################################################################
-class RunPredictiveModels(object):
+class RunModels(object):
     """Run models using cross validation
     Parameters:
     <gene_name>: a string e.g. 'ryr2'
@@ -22,24 +23,22 @@ class RunPredictiveModels(object):
     
     To run without ensembling, i.e. to run each architecture/hyperparameter
     grouping on only one instantiation of the model, set ensemble=[1]"""
-    def __init__(self, gene_name, modeling_approach,
-                 data, what_to_run, testing):
-        self.gene_name = gene_name
+    def __init__(self, modeling_approach,
+                 data, what_to_run):
+        
         self.modeling_approach = modeling_approach
-        assert self.modeling_approach in ['MLP','LR']
+        assert self.modeling_approach in ['MLP','LR', 'DecisionTree']
         self.data = data
-        if testing:
-            self.number_of_cv_folds = 2
-        else:
-            self.number_of_cv_folds = 10 #ten fold cross validation
+       
+        self.number_of_cv_folds = 10 #ten fold cross validation
         self.max_epochs = 1000
         self.what_to_run = what_to_run
-        self.testing = testing
+        self.best_model = None
         
         if what_to_run == 'grid_search':
             self._run_grid_search()
-        elif what_to_run == 'test_pred':
-            self._run_test_pred()
+        elif what_to_run == 'rand_search':
+            print('Hello')
             
     # Grid Search Method #------------------------------------------------------
     def _run_grid_search(self):
@@ -48,28 +47,24 @@ class RunPredictiveModels(object):
         model setup for the given modeling approach."""
             
         if self.modeling_approach == 'LR':
-            if self.testing:
-                self._initialize_search_params_lr_testing()
-            else:
-                self._initialize_grid_search_params_lr()
+
+            self._initialize_grid_search_params_lr()
             self._run_lr_grid_search()
 
+        if self.modeling_approach == 'DecisionTree':
+
+            self._initialize_grid_search_params_decision_tree()
+            self._run_decision_tree_grid_search()
+
+
     # LR Methods #--------------------------------------------------------------
-    def _initialize_grid_search_params_lr_testing(self):
-        """Initialize a small list of hyperparameters to try for testing purposes"""
-        # Define hyperparameters grid for grid search
-        param_grid = {
-        'penalty': ['l1'],  # Regularization penalty
-        'C': [0.1],  # Inverse of regularization strength
-        'solver': ['liblinear', 'saga']  # Optimization algorithm
-        }
     
     def _initialize_grid_search_params_lr(self):
-        """Initialize lists of hyperparmeters to assess"""
+        """Initialize lists of hyperparameters to assess"""
         # Define hyperparameters grid for grid search
         self.param_grid = {
         'penalty': ['l1', 'l2'],  # Regularization penalty
-        'C': [0.001, 0.01, 0.1, 1, 10, 100],  # Inverse of regularization strength
+        'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000],  # Inverse of regularization strength
         'solver': ['liblinear', 'saga']  # Optimization algorithm
         }
 
@@ -77,16 +72,37 @@ class RunPredictiveModels(object):
     def _run_lr_grid_search(self):
         """Run grid search with logistic regression model for each combination of hyperparameters"""
         # Define GridSearchCV object
-        grid_search = GridSearchCV(estimator=LogisticRegression(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
+        gs = GridSearchCV(estimator=LogisticRegression(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
 
         # Perform GridSearchCV
-        grid_search.fit(self.data.X_train, self.data.y_train)
-        y_pr=grid_search.decision_function(self.data.X_train)
-        print(grid_search.score(self.data.X_train, self.data.y_train))
-        print(roc_auc_score(self.data.y_train, y_pr))
+        gs.fit(self.data.X_train, self.data.y_train)
+        print('Best K-fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
+        print('Best LR Params:', gs.best_params_)
+        self.best_model = gs #save GridSearch object
 
 
+    # Decision Tree Methods #--------------------------------------------------------------
+        
+    def _initialize_grid_search_params_decision_tree(self):
+        """Initialize lists of hyperparameters to assess"""
+        # Define hyperparameters grid for grid search
+        self.param_grid = {
+            'max_depth': [1, 2, 3, 4, 5, 6, 7, None],
+            'criterion': ['gini', 'entropy']
+            }
+    
+    def _run_decision_tree_grid_search(self):
+        """Run grid search with logistic regression model for each combination of hyperparameters"""
+        # Define GridSearchCV object
+        gs = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
 
-        print('Best Auc:', grid_search.best_score_)
-        print('Best Params:', grid_search.best_params_)
+        # Perform GridSearchCV
+        gs.fit(self.data.X_train, self.data.y_train)
+        print('Best K-Fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
+        print('Best DecisionTree Params:', gs.best_params_)
+        self.best_model = gs #save GridSearch object
+
+        
+
+    
     
