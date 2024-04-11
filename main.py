@@ -31,5 +31,7 @@ def run(data, what_to_run, modeling_approach):
 
 
 data = get_prepared_data('KCNQ1')   
-run(data, 'grid_search', 'LR')
-run(data, 'grid_search', 'DecisionTree')
+# run(data, 'grid_search', 'LR')
+# run(data, 'grid_search', 'DecisionTree')
+# run(data, 'grid_search', 'RandomForest')
+run(data, 'grid_search', 'GradientBoosting')

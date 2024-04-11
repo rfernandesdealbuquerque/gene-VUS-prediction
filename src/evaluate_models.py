@@ -24,13 +24,19 @@ class EvaluateModels(object):
         
         self.best_model = best_model
         self.modeling_approach = modeling_approach
-        assert self.modeling_approach in ['MLP','LR','DecisionTree']
+        assert self.modeling_approach in ['MLP','LR','DecisionTree', 'RandomForest', 'GradientBoosting']
         self.data = data
         
         if modeling_approach == 'LR':
             self._evaluate_lr()
         elif modeling_approach == 'DecisionTree':
             self._evaluate_decision_tree()
+
+        elif modeling_approach == 'RandomForest':
+            self._evaluate_random_forest()
+
+        elif modeling_approach == 'GradientBoosting':
+            self._evaluate_random_forest()        
     
     def _evaluate_lr(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
@@ -41,5 +47,15 @@ class EvaluateModels(object):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
         print('DecisionTree Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
         print('DecisionTree Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+
+    def _evaluate_random_forest(self):
+        #this is the auc performance of the model with the best parameters trained on the whole training set.
+        print('RandomForest Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
+        print('RandomForest Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+    
+    def _evaluate_gradient_boosting(self):
+        #this is the auc performance of the model with the best parameters trained on the whole training set.
+        print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
+        print('GradientBoosting Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
 
         

@@ -1,3 +1,4 @@
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GridSearchCV
@@ -27,7 +28,7 @@ class RunModels(object):
                  data, what_to_run):
         
         self.modeling_approach = modeling_approach
-        assert self.modeling_approach in ['MLP','LR', 'DecisionTree']
+        assert self.modeling_approach in ['MLP','LR', 'DecisionTree', 'RandomForest', 'GradientBoosting']
         self.data = data
        
         self.number_of_cv_folds = 10 #ten fold cross validation
@@ -51,10 +52,20 @@ class RunModels(object):
             self._initialize_grid_search_params_lr()
             self._run_lr_grid_search()
 
-        if self.modeling_approach == 'DecisionTree':
+        elif self.modeling_approach == 'DecisionTree':
 
             self._initialize_grid_search_params_decision_tree()
             self._run_decision_tree_grid_search()
+
+        elif self.modeling_approach == 'RandomForest':
+
+            self._initialize_grid_search_params_random_forest()
+            self._run_random_forest_grid_search()   
+
+        elif self.modeling_approach == 'GradientBoosting':
+
+            self._initialize_grid_search_params_gradient_boosting()
+            self._run_gradient_boosting_grid_search() 
 
 
     # LR Methods #--------------------------------------------------------------
@@ -82,7 +93,6 @@ class RunModels(object):
 
 
     # Decision Tree Methods #--------------------------------------------------------------
-        
     def _initialize_grid_search_params_decision_tree(self):
         """Initialize lists of hyperparameters to assess"""
         # Define hyperparameters grid for grid search
@@ -92,7 +102,7 @@ class RunModels(object):
             }
     
     def _run_decision_tree_grid_search(self):
-        """Run grid search with logistic regression model for each combination of hyperparameters"""
+        """Run grid search with decision tree model for each combination of hyperparameters"""
         # Define GridSearchCV object
         gs = GridSearchCV(estimator=DecisionTreeClassifier(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
 
@@ -100,6 +110,49 @@ class RunModels(object):
         gs.fit(self.data.X_train, self.data.y_train)
         print('Best K-Fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
         print('Best DecisionTree Params:', gs.best_params_)
+        self.best_model = gs #save GridSearch object
+
+    # RandomForest Methods #--------------------------------------------------------------
+    def _initialize_grid_search_params_random_forest(self):
+        """Initialize lists of hyperparameters to assess"""
+        # Define hyperparameters grid for grid search
+        self.param_grid = { 'bootstrap': [True, False],
+                            'max_depth': [10, 20, None],
+                            'max_features': ['auto', 'sqrt'],
+                            'min_samples_leaf': [1, 2],
+                            'min_samples_split': [2, 5],
+                            'n_estimators': [200, 400]}
+    
+    def _run_random_forest_grid_search(self):
+        """Run grid search with random forest model for each combination of hyperparameters"""
+        # Define GridSearchCV object
+        gs = GridSearchCV(estimator=RandomForestClassifier(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
+
+        # Perform GridSearchCV
+        gs.fit(self.data.X_train, self.data.y_train)
+        print('Best K-Fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
+        print('Best RandomForest Params:', gs.best_params_)
+        self.best_model = gs #save GridSearch object
+
+     # GradientBoosting Methods #--------------------------------------------------------------
+    def _initialize_grid_search_params_gradient_boosting(self):
+        """Initialize lists of hyperparameters to assess"""
+        # Define hyperparameters grid for grid search
+        self.param_grid = { 'max_depth': [10, 20, None],
+                            'max_features': ['auto', 'sqrt'],
+                            'min_samples_leaf': [1, 2],
+                            'min_samples_split': [2, 5],
+                            'n_estimators': [200, 400]}
+    
+    def _run_gradient_boosting_grid_search(self):
+        """Run grid search with gradient boosting model for each combination of hyperparameters"""
+        # Define GridSearchCV object
+        gs = GridSearchCV(estimator=GradientBoostingClassifier(), param_grid=self.param_grid, cv=self.number_of_cv_folds, scoring='roc_auc', n_jobs=-1)
+
+        # Perform GridSearchCV
+        gs.fit(self.data.X_train, self.data.y_train)
+        print('Best K-Fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
+        print('Best GradientBoosting Params:', gs.best_params_)
         self.best_model = gs #save GridSearch object
 
         
