@@ -32,7 +32,6 @@ class RunModels(object):
         self.data = data
        
         self.number_of_cv_folds = 10 #ten fold cross validation
-        self.max_epochs = 1000
         self.what_to_run = what_to_run
         self.best_model = None
         

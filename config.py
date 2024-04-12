@@ -1,6 +1,6 @@
 #GLOBAL VARIABLE DEFINITIONS
 
-seed = 270620  #To make results reproducible
+seed = 523 #To make results reproducible
 
 #Rodrigo's Main
 home = "C:/dev/Python/gene-VUS-prediction"

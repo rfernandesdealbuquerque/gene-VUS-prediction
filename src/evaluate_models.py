@@ -41,7 +41,7 @@ class EvaluateModels(object):
     def _evaluate_lr(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
         print('LR Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
-        print('LR Test: ',self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+        print('LR Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
 
     def _evaluate_decision_tree(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
