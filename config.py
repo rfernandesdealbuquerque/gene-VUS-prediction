@@ -1,6 +1,7 @@
 #GLOBAL VARIABLE DEFINITIONS
+import numpy as np
 
-seed = 523 #To make results reproducible
+#seed = np.random.randint(low=1, high=280293) #To make results reproducible
 
 #Rodrigo's Main
 home = "C:/dev/Python/gene-VUS-prediction"

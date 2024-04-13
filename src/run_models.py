@@ -25,7 +25,7 @@ class RunModels(object):
     To run without ensembling, i.e. to run each architecture/hyperparameter
     grouping on only one instantiation of the model, set ensemble=[1]"""
     def __init__(self, modeling_approach,
-                 data, what_to_run):
+                 data, what_to_run, seed):
         
         self.modeling_approach = modeling_approach
         assert self.modeling_approach in ['MLP','LR', 'DecisionTree', 'RandomForest', 'GradientBoosting']
@@ -34,6 +34,7 @@ class RunModels(object):
         self.number_of_cv_folds = 10 #ten fold cross validation
         self.what_to_run = what_to_run
         self.best_model = None
+        self.seed = seed
         
         if what_to_run == 'grid_search':
             self._run_grid_search()
@@ -75,7 +76,8 @@ class RunModels(object):
         self.param_grid = {
         'penalty': ['l1', 'l2'],  # Regularization penalty
         'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000],  # Inverse of regularization strength
-        'solver': ['liblinear', 'saga']  # Optimization algorithm
+        'solver': ['liblinear', 'saga'],  # Optimization algorithm
+        'max_iter': [100]
         }
 
     

@@ -1,6 +1,9 @@
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GridSearchCV
+
+import config
 
 
 class EvaluateModels(object):
@@ -20,12 +23,19 @@ class EvaluateModels(object):
     To run without ensembling, i.e. to run each architecture/hyperparameter
     grouping on only one instantiation of the model, set ensemble=[1]"""
     def __init__(self, modeling_approach,
-                 data, best_model):
+                 data, best_model, seed):
         
         self.best_model = best_model
+        self.seed = seed
         self.modeling_approach = modeling_approach
         assert self.modeling_approach in ['MLP','LR','DecisionTree', 'RandomForest', 'GradientBoosting']
         self.data = data
+        self.evaluation_results_lr_df = None
+        self.results_lr_dict = {'Train AUC': [],
+                           'Test AUC': [],
+                           'Penalty': [],
+                           'C': [],
+                           'Solver': []}
         
         if modeling_approach == 'LR':
             self._evaluate_lr()
@@ -40,22 +50,38 @@ class EvaluateModels(object):
     
     def _evaluate_lr(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('LR Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
-        print('LR Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+        
+        # print('LR Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
+        # print('LR Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+        self.results_lr_dict = {'Seed': self.seed,
+                           'Best K-fold AUC': self.best_model.best_score_,
+                           'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
+                           'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
+                           'Penalty': self.best_model.best_params_['penalty'],
+                           'C': self.best_model.best_params_['C'],
+                           'Solver': self.best_model.best_params_['solver']}
+        
+        print(self.results_lr_dict)
+        
+        # results_lr_dict['Train AUC'].append(self.best_model.score(self.data.X_train, self.data.y_train))
+        # results_lr_dict['Test AUC'].append(self.best_model.score(self.data.X_test, self.data.y_test)
+        # results_lr_dict['Penalty'].append(self.best_model.best_params_['penalty'])
+        # results_lr_dict['C'].append(self.best_model.best_params_['C'])
+        # results_lr_dict['Solver'].append(self.best_model.best_params_['solver'])
 
     def _evaluate_decision_tree(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('DecisionTree Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
+        print('DecisionTree Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
         print('DecisionTree Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
 
     def _evaluate_random_forest(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('RandomForest Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
+        print('RandomForest Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
         print('RandomForest Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
     
     def _evaluate_gradient_boosting(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the training set.
+        print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
         print('GradientBoosting Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
 
         
