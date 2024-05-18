@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 from data import prepare_data
 
@@ -38,25 +39,24 @@ def run_evaluate(data, what_to_run, modeling_approach, seed):
 def run_evaluate_with_loop(gene_name, what_to_run, modeling_approach, iterations):
     results_dict_list = []
     for i in range(0, iterations):
-        seed = np.random.randint(low=1, high=280293)
+        seed = np.random.randint(low=1, high=270620)
         data = get_prepared_data(gene_name, seed)  
         evaluate = run_evaluate(data, what_to_run, modeling_approach, seed)
-        results_dict_list.append(evaluate.results_lr_dict)
+        print(evaluate.results_dict)
+        results_dict_list.append(evaluate.results_dict)
 
     results_df = pd.DataFrame.from_dict(results_dict_list)
-    plt.hist(results_df['Test AUC'])
+    print(results_df.sort_values(by='Test AUC', ascending=False))
+    sns.histplot(data=results_df, x='Test AUC')
     plt.show()
-
 
 # seed = np.random.randint(low=1, high=280293)
 # data = get_prepared_data('KCNQ1', seed) 
 # run_evaluate(data, 'grid_search', 'LR', seed)
-# run_evaluate(data, 'grid_search', 'DecisionTree')
-# run_evaluate(data, 'grid_search', 'RandomForest')
-# run_evaluate(data, 'grid_search', 'GradientBoosting')
+# run_evaluate(data, 'grid_search', 'DecisionTree', seed)
+# run_evaluate(data, 'grid_search', 'RandomForest', seed)
+# run_evaluate(data, 'grid_search', 'GradientBoosting', seed)
 
-run_evaluate_with_loop('KCNQ1', 'grid_search', 'LR', 100)
-
-# run(data, 'grid_search', 'DecisionTree')
-# run(data, 'grid_search', 'RandomForest')
-# run(data, 'grid_search', 'GradientBoosting')
+run_evaluate_with_loop('KCNQ1', 'grid_search', 'LR', 3)
+#run_evaluate_with_loop('KCNQ1', 'grid_search', 'DecisionTree', 500)
+# run_evaluate_with_loop('KCNQ1', 'grid_search', 'RandomForest', 5)

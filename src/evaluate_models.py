@@ -30,15 +30,11 @@ class EvaluateModels(object):
         self.modeling_approach = modeling_approach
         assert self.modeling_approach in ['MLP','LR','DecisionTree', 'RandomForest', 'GradientBoosting']
         self.data = data
-        self.evaluation_results_lr_df = None
-        self.results_lr_dict = {'Train AUC': [],
-                           'Test AUC': [],
-                           'Penalty': [],
-                           'C': [],
-                           'Solver': []}
+        self.results_dict = {}
         
         if modeling_approach == 'LR':
             self._evaluate_lr()
+
         elif modeling_approach == 'DecisionTree':
             self._evaluate_decision_tree()
 
@@ -53,32 +49,43 @@ class EvaluateModels(object):
         
         # print('LR Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
         # print('LR Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
-        self.results_lr_dict = {'Seed': self.seed,
-                           'Best K-fold AUC': self.best_model.best_score_,
-                           'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
-                           'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
-                           'Penalty': self.best_model.best_params_['penalty'],
-                           'C': self.best_model.best_params_['C'],
-                           'Solver': self.best_model.best_params_['solver']}
+        self.results_dict = {'Seed': self.seed,
+                             'Best K-fold AUC': self.best_model.best_score_,
+                             'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
+                             'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
+                             'Penalty': self.best_model.best_params_['penalty'],
+                             'C': self.best_model.best_params_['C'],
+                             'Solver': self.best_model.best_params_['solver']}
         
-        print(self.results_lr_dict)
-        
-        # results_lr_dict['Train AUC'].append(self.best_model.score(self.data.X_train, self.data.y_train))
-        # results_lr_dict['Test AUC'].append(self.best_model.score(self.data.X_test, self.data.y_test)
-        # results_lr_dict['Penalty'].append(self.best_model.best_params_['penalty'])
-        # results_lr_dict['C'].append(self.best_model.best_params_['C'])
-        # results_lr_dict['Solver'].append(self.best_model.best_params_['solver'])
 
     def _evaluate_decision_tree(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('DecisionTree Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
-        print('DecisionTree Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+        # print('DecisionTree Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
+        # print('DecisionTree Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+
+        self.results_dict = {'Seed': self.seed,
+                             'Best K-fold AUC': self.best_model.best_score_,
+                             'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
+                             'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
+                             'max_depth': self.best_model.best_params_['max_depth'],
+                             'criterion': self.best_model.best_params_['criterion']}
 
     def _evaluate_random_forest(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('RandomForest Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
-        print('RandomForest Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
-    
+        # print('RandomForest Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
+        # print('RandomForest Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+
+        self.results_dict = {'Seed': self.seed,
+                             'Best K-fold AUC': self.best_model.best_score_,
+                             'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
+                             'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
+                             'bootstrap': self.best_model.best_params_['bootstrap'],
+                             'max_depth': self.best_model.best_params_['max_depth'],
+                             'max_features': self.best_model.best_params_['max_features'],
+                             'min_samples_leaf': self.best_model.best_params_['min_samples_leaf'],
+                             'min_samples_split': self.best_model.best_params_['min_samples_split'],
+                             'n_estimators': self.best_model.best_params_['n_estimators']}
+        
     def _evaluate_gradient_boosting(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
         print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
