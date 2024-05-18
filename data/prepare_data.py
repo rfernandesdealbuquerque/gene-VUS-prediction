@@ -1,4 +1,3 @@
-import copy
 import sys
 
 import numpy as np
@@ -6,9 +5,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-import config
-
 sys.path.append('../../')
+import data.config as config
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)

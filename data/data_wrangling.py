@@ -1,10 +1,8 @@
 import copy
 import sys
 
-import pandas as pd
-
-sys.path.append('../../')
 import config
+import pandas as pd
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -12,7 +10,7 @@ pd.set_option('display.max_columns', None)
 AMINO_ACIDS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
                'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', 'X']
 
-gene_name = 'KCNQ1'
+gene_name = 'RYR2'
 
 def check_symbols(df, key):
         """Check symbols so that everything in the Original and Change columns
