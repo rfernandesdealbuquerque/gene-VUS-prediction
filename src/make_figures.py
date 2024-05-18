@@ -36,10 +36,11 @@ class MakeFigures:
 
     def plot_roc_curve(self):
         #ROC curve for model evaluation
+        plt.clf()
         model = self.model
         pred_probs = model.decision_function(self.data.X_test)
         true_labels = self.data.y_test
-        fpr, tpr, _ = sklearn.metrics.roc_curve(true_labels, pred_probs,pos_label = 1)
+        fpr, tpr, _ = sklearn.metrics.roc_curve(true_labels, pred_probs, pos_label = 1)
         roc_auc = sklearn.metrics.auc(fpr, tpr)
         line, = plt.plot(fpr, tpr, color=self.color, lw=self.lw, linestyle = self.linestyle)
 
@@ -48,15 +49,15 @@ class MakeFigures:
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title(f'{self.gene_name} - ROC of Best Model - {self.modeling_approach}')
-        plt.legend([line], [f'{self.modeling_approach}, AUROC=%0.2f' % roc_auc,], loc='lower right')
-        plt.savefig(os.path.join(self.save_dir, self.gene_name+f'_Best_Model_{self.modeling_approach}_ROC_Curve.jpg'))
-        plt.show()
+        plt.title(f'{self.gene_name} - ROC of Median Model - {self.modeling_approach}')
+        plt.legend([line], [f'{self.modeling_approach}, AUC=%0.4f' % roc_auc,], loc='lower right')
+        plt.savefig(os.path.join(self.save_dir, self.gene_name+f'_Median_Model_{self.modeling_approach}_ROC_Curve.jpg'))
         plt.close()
 
         #ROC curve for algorithm evaluation
         
     def plot_performance_hist(self):
+        plt.clf()
         results_df = self.results_df
         sns.histplot(data=results_df, x='Test AUC')
         plt.xlabel('Test AUC')

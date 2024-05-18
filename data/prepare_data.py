@@ -25,7 +25,6 @@ class PrepareData(object):
         X = df[all_features]
         X = pd.get_dummies(X, drop_first=True, dtype=int)
         #self.one_hot_encoding_top_n(X, ['Original', 'Change'], 5)
-        # print(X.head(10))
         y = df['Label']
 
         

@@ -10,7 +10,9 @@ pd.set_option('display.max_columns', None)
 AMINO_ACIDS = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L',
                'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', 'X']
 
-gene_name = 'RYR2'
+gene_name = 'KCNQ1'
+# gene_name = 'MYH7'
+# gene_name = 'RYR2'
 
 def check_symbols(df, key):
         """Check symbols so that everything in the Original and Change columns

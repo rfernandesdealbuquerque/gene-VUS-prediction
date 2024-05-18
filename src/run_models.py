@@ -1,3 +1,4 @@
+import sklearn
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
@@ -88,7 +89,7 @@ class RunModels(object):
 
         # Perform GridSearchCV
         gs.fit(self.data.X_train, self.data.y_train)
-        print('Best K-fold Auc:', gs.best_score_) #this is the best model avg. auc performance across the 10 folds. The model with this score is used to get the best_params_
+        print('Best K-fold Auc:', gs.best_score_) #this is the avg. auc performance across the 10 folds of the best model. The model with this score is used to get the best_params_
         print('Best LR Params:', gs.best_params_)
         self.best_model = gs #save GridSearch object
 

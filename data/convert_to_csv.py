@@ -40,6 +40,7 @@ def convert_signal_to_noise_to_csv(gene_name):
     # Read the data from the specified sheet
     df = pd.read_excel(config.data + f'/{gene_name}/1. Raw/{gene_name}_concise_UpdatedGnomAD.xlsx', sheet_name='Signal to Noise @ AA position')
     df = df.iloc[1:, :]
+    df.columns.values[1] = "Signal To Noise"
     df.to_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_Signal_to_Noise.csv', index=False)
 
     return
@@ -50,7 +51,7 @@ def convert_evolutionary_score_to_csv(gene_name):
     df.to_csv(config.data + f'/{gene_name}/1. Raw/{gene_name}_Conservation_Score.csv', index=False)
 
 
-gene_list = {'MYH7', 'RYR2'}
+gene_list = {'KCNQ1', 'MYH7', 'RYR2'}
 
 for gene in gene_list:
     convert_variants_to_csv(gene)
