@@ -33,12 +33,14 @@ class RunStudy:
             data = prepare_data.PrepareData(gene_name, all_features, seed) #Get data object with train/test splits for given seed
             print('\n*** Running ', modeling_approach,'***')
             run = run_models.RunModels(modeling_approach, data, what_to_run, seed) 
-            evaluate = evaluate_models.EvaluateModels(modeling_approach, data, run.best_model, seed)
+            evaluate = evaluate_models.EvaluateModels(modeling_approach, data, run.best_model, seed) #Evaluate best_model obtained from cross validation
             self.best_models_from_cross_validation[seed] = run.best_model
             print(evaluate.results_dict)
             results_dict_list.append(evaluate.results_dict)
 
-        results_df = pd.DataFrame.from_dict(results_dict_list).sort_values(by='Test AUC', ascending=False)
+        results_df = pd.DataFrame.from_dict(results_dict_list)
+        results_df = results_df.sort_values(by=list(results_df.columns[3:]), ascending=False)
+        #We need to group by hyperparameters, see which group performed the best across all different seeds and then use that group as the best model.
         print(results_df)
         self.results_df = results_df
         #Get seed for the best and median test AUC models to get the models and the splits used for their generation
@@ -46,11 +48,11 @@ class RunStudy:
         seed_best_model = results_df.iloc[0, 0]
         self.median_model = self.best_models_from_cross_validation[seed_median_model]
         self.best_model = self.best_models_from_cross_validation[seed_best_model]
-        self.data_best_model = self.get_prepared_data(self.gene_name, seed_best_model)
-        self.data_median_model = self.get_prepared_data(self.gene_name, seed_median_model)
+        self.data_best_model = prepare_data.PrepareData(self.gene_name, all_features, seed_best_model)
+        self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model)
 
 
-RunStudy('KCNQ1', 'grid_search', 'LR', iterations=10)
+RunStudy('KCNQ1', 'grid_search', 'LR', iterations=3)
 # RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
 # RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
 
