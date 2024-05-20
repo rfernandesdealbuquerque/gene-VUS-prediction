@@ -10,6 +10,7 @@ from data import prepare_data
 
 #Custom imports
 from src import evaluate_models, make_figures, run_models
+from utils import get_best_hyperparameters
 
 
 class RunStudy:
@@ -43,7 +44,8 @@ class RunStudy:
         #We need to group by hyperparameters, see which group performed the best across all different seeds and then use that group as the best model.
         print(results_df)
         self.results_df = results_df
-        #Get seed for the best and median test AUC models to get the models and the splits used for their generation
+        get_best_hyperparameters.get_best_hyperparameters(results_df)
+        #Get seed for the best and median test AUC models to get the models and the splits used for their generation      
         seed_median_model = results_df.iloc[len(results_df)//2, 0]
         seed_best_model = results_df.iloc[0, 0]
         self.median_model = self.best_models_from_cross_validation[seed_median_model]
@@ -52,7 +54,7 @@ class RunStudy:
         self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model)
 
 
-RunStudy('KCNQ1', 'grid_search', 'LR', iterations=3)
+RunStudy('KCNQ1', 'grid_search', 'LR', iterations=100)
 # RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
 # RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
 
