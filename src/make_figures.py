@@ -47,16 +47,16 @@ class MakeFigures:
         line, = plt.plot(fpr, tpr, color=self.color, lw=self.lw, linestyle = self.linestyle)
 
         best_hyperparameters_text = ''
-        for i in range(1, len(self.best_hyperparameters.columns)):
-            best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[1,i]}' + '\n'
+        for i in range(0, len(self.best_hyperparameters.columns)):
+            best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]}' + '\n'
         print(best_hyperparameters_text)
-        plt.text(1,1, best_hyperparameters_text)
+        plt.text(0.65, 0.18, best_hyperparameters_text)
         plt.plot([0, 1], [0, 1], color=self.neutral_color, lw=self.lw, linestyle=self.neutral_linestyle) #diagonal line
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title(f'{self.gene_name} - ROC of Best Model - {self.modeling_approach}')
+        plt.title(f'{self.gene_name} - ROC of Median Model - {self.modeling_approach}')
         plt.legend([line], [f'{self.modeling_approach}, AUC=%0.4f' % roc_auc,], loc='lower right')
         plt.savefig(os.path.join(self.save_dir, self.gene_name+f'_Median_Model_{self.modeling_approach}_ROC_Curve.jpg'))
         plt.close()

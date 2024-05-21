@@ -13,7 +13,7 @@ from data import prepare_data
 
 #Custom imports
 from src import evaluate_models, make_figures, run_models
-from utils import get_best_hyperparameters
+from utils import get_best_hyperparameters, get_median_model_seed
 
 
 class RunStudy:
@@ -25,7 +25,7 @@ class RunStudy:
         self.iterations = iterations
 
         self.run_evaluate_with_various_seeds(self.gene_name, self.what_to_run, self.modeling_approach, self.iterations)
-        make_figures.MakeFigures(self.gene_name, self.best_model, self.data_make_figures, self.results_df, self.modeling_approach, self.best_hyperparameters)
+        make_figures.MakeFigures(self.gene_name, self.best_model, self.data_median_model, self.results_df, self.modeling_approach, self.best_hyperparameters)
 
     def run_evaluate_with_various_seeds(self, gene_name, what_to_run, modeling_approach, iterations) -> pd.DataFrame:
         """This runs the run_evaluate method multiple times with different seeds in order to get the results for various train/test splits. It returns a DataFrame with the performance metrics and the hyperparameters picked for the given model."""
@@ -45,8 +45,12 @@ class RunStudy:
         #We need to group by hyperparameters, see which group performed the best across all different seeds and then use that group as the best model.
         print(results_df)
         self.results_df = results_df
-        best_hyperparameters = get_best_hyperparameters.get_best_hyperparameters(results_df) #Returns the group of hyperparameters that showed up the most and performed the best among the various runs of different seeds.
+        #Returns the group of hyperparameters that showed up the most and performed the best among the various runs of different seeds.
+        best_hyperparameters = get_best_hyperparameters.get_best_hyperparameters(results_df) 
         self.best_hyperparameters = best_hyperparameters
+
+        #Returns seed of median model among the models with best hyperparameters
+        seed_median_model = get_median_model_seed.get_median_model_seed(best_hyperparameters, results_df)
 
         if modeling_approach == 'LR':
             self.best_model = LogisticRegression(
@@ -54,14 +58,14 @@ class RunStudy:
                 C=best_hyperparameters.at[0,'C'],
                 solver=best_hyperparameters.at[0, 'Solver'],
             )
-            random_seed = np.random.randint(0, 10)
-            self.data_make_figures = prepare_data.PrepareData(self.gene_name, all_features, random_seed)
+            self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.
 
         elif modeling_approach == 'DecisionTree':
             self.best_model = DecisionTreeClassifier(
                 max_depth=best_hyperparameters.at[0,'max_depth'],
                 criterion=best_hyperparameters.at[0, 'criterion'],
             )
+            self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.
 
         elif modeling_approach == 'RandomForest':
             pass
@@ -73,7 +77,8 @@ class RunStudy:
             
         
 
-RunStudy('KCNQ1', 'grid_search', 'LR', iterations=3)
-# RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
-# RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
+RunStudy('KCNQ1', 'grid_search', 'LR', iterations=100)
+RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
+RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
+
 
