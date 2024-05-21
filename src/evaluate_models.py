@@ -1,4 +1,5 @@
 import pandas as pd
+import sklearn.metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GridSearchCV
@@ -47,6 +48,7 @@ class EvaluateModels(object):
         
         # print('LR Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
         # print('LR Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+
         self.results_dict = {'Seed': self.seed,
                              'Best K-fold AUC': self.best_model.best_score_,
                              'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
@@ -54,6 +56,11 @@ class EvaluateModels(object):
                              'Penalty': self.best_model.best_params_['penalty'],
                              'C': self.best_model.best_params_['C'],
                              'Solver': self.best_model.best_params_['solver']}
+        
+        # pred_probs = self.best_model.decision_function(self.data.X_test)
+        # true_labels = self.data.y_test
+        # fpr, tpr, _ = sklearn.metrics.roc_curve(true_labels, pred_probs, pos_label = 1)
+        # print('Test AUC Through Other Method', sklearn.metrics.auc(fpr, tpr))     
         
 
     def _evaluate_decision_tree(self):
