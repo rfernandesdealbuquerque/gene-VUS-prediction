@@ -23,12 +23,17 @@ class RunStudy:
         self.modeling_approach = modeling_approach
         self.what_to_run = what_to_run
         self.iterations = iterations
+        self.results_df = pd.DataFrame()
+        self.best_hyperparameters = pd.DataFrame()
+        self.best_model = None
+        self.data_median_model = None #PrepareData object
+
 
         self.run_evaluate_with_various_seeds(self.gene_name, self.what_to_run, self.modeling_approach, self.iterations)
         make_figures.MakeFigures(self.gene_name, self.best_model, self.data_median_model, self.results_df, self.modeling_approach, self.best_hyperparameters)
 
-    def run_evaluate_with_various_seeds(self, gene_name, what_to_run, modeling_approach, iterations) -> pd.DataFrame:
-        """This runs the run_evaluate method multiple times with different seeds in order to get the results for various train/test splits. It returns a DataFrame with the performance metrics and the hyperparameters picked for the given model."""
+    def run_evaluate_with_various_seeds(self, gene_name, what_to_run, modeling_approach, iterations):
+        """This runs the algorithm, picks the best model through GridSearch and then evaluate it. It does this multiple times with different seeds in order to get the results for various train/test splits. It returns a DataFrame with the performance metrics and the hyperparameters picked for the given model."""
         all_features =['AA position', 'Score', 'Signal To Noise','Original','Change','Functional Domain']
         results_dict_list = []
         unique_seeds = np.random.choice(np.arange(11, 270600), size=iterations, replace=False)
@@ -62,23 +67,32 @@ class RunStudy:
 
         elif modeling_approach == 'DecisionTree':
             self.best_model = DecisionTreeClassifier(
-                max_depth=best_hyperparameters.at[0,'max_depth'],
+                max_depth=int(best_hyperparameters.at[0,'max_depth']),
                 criterion=best_hyperparameters.at[0, 'criterion'],
             )
             self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.
 
         elif modeling_approach == 'RandomForest':
-            pass
-
-              
+            self.best_model = RandomForestClassifier(
+                n_estimators=int(best_hyperparameters.at[0,'n_estimators']),
+                bootstrap=best_hyperparameters.at[0,'bootstrap'],
+                max_depth=int(best_hyperparameters.at[0,'max_depth']),
+                max_features=(best_hyperparameters.at[0,'max_features']),
+                min_samples_leaf=int(best_hyperparameters.at[0,'min_samples_leaf']),
+                min_samples_split=int(best_hyperparameters.at[0,'min_samples_split']),
+            )
+            self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.           
 
         elif modeling_approach == 'GradientBoosting':
             pass
             
         
 
-RunStudy('KCNQ1', 'grid_search', 'LR', iterations=100)
-RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
-RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
+RunStudy('KCNQ1', 'rand_search', 'RandomForest', iterations=20)
+# RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
+# RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
+
+
+
 
 

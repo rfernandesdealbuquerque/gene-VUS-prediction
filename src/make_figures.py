@@ -39,16 +39,24 @@ class MakeFigures:
         #ROC curve for model evaluation
         plt.clf()
         model = self.model
-        model.fit(self.data.X_test, self.data.y_test)
-        pred_probs = model.decision_function(self.data.X_test)
+        model.fit(self.data.X_train, self.data.y_train)
+        if self.modeling_approach == 'LR':
+            pred_probs = model.decision_function(self.data.X_test)
+        else:
+            pred_probs = model.predict_proba(self.data.X_test)[:, 1]
+        
         true_labels = self.data.y_test
         fpr, tpr, _ = sklearn.metrics.roc_curve(true_labels, pred_probs, pos_label = 1)
         roc_auc = sklearn.metrics.auc(fpr, tpr)
         line, = plt.plot(fpr, tpr, color=self.color, lw=self.lw, linestyle = self.linestyle)
 
         best_hyperparameters_text = ''
-        for i in range(0, len(self.best_hyperparameters.columns)):
-            best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]}' + '\n'
+        num_columns = len(self.best_hyperparameters.columns)
+        for i in range(0, num_columns):
+            if i == num_columns - 2:
+                best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]*100} %' + '\n'
+            else:
+                best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]}' + '\n'
         print(best_hyperparameters_text)
         plt.text(0.65, 0.18, best_hyperparameters_text)
         plt.plot([0, 1], [0, 1], color=self.neutral_color, lw=self.lw, linestyle=self.neutral_linestyle) #diagonal line

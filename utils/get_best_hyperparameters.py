@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_best_hyperparameters(results_df):
+def get_best_hyperparameters(results_df) -> pd.DataFrame:
     '''This gets results_df, groups the models with same hyperparameters, averages the performance of each group and returns the hyperparameters with best average.'''
     grouped = results_df.groupby(results_df.columns.tolist()[4:])['Test AUC'].agg(['mean', 'count']).reset_index()
     grouped['mean'] = grouped['mean'].round(3)
