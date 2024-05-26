@@ -26,7 +26,7 @@ class RunModels(object):
     To run without ensembling, i.e. to run each architecture/hyperparameter
     grouping on only one instantiation of the model, set ensemble=[1]"""
     def __init__(self, modeling_approach,
-                 data, what_to_run, seed, n_iter=10):
+                 data, what_to_run, seed, n_iter):
         
         self.modeling_approach = modeling_approach
         assert self.modeling_approach in ['MLP','LR', 'DecisionTree', 'RandomForest', 'GradientBoosting']
@@ -122,7 +122,7 @@ class RunModels(object):
         self.param_grid = {'n_estimators': [100,   200, 500],
                             'bootstrap': [True, False],
                             'max_depth': [10, 20, 30, None],
-                            'max_features': ['auto', 'sqrt'],
+                            'max_features': ['sqrt', 'log2'],
                             'min_samples_leaf': [1, 2, 5, 10],
                             'min_samples_split': [2, 5, 10]}
     
@@ -142,7 +142,7 @@ class RunModels(object):
         """Initialize lists of hyperparameters to assess"""
         # Define hyperparameters grid for grid search
         self.param_grid = { 'max_depth': [10, 20, None],
-                            'max_features': ['auto', 'sqrt'],
+                            'max_features': ['sqrt'],
                             'min_samples_leaf': [1, 2],
                             'min_samples_split': [2, 5],
                             'n_estimators': [200, 400]}

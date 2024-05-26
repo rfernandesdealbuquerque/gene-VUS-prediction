@@ -36,11 +36,11 @@ class RunStudy:
         """This runs the algorithm, picks the best model through GridSearch and then evaluate it. It does this multiple times with different seeds in order to get the results for various train/test splits. It returns a DataFrame with the performance metrics and the hyperparameters picked for the given model."""
         all_features =['AA position', 'Score', 'Signal To Noise','Original','Change','Functional Domain']
         results_dict_list = []
-        unique_seeds = np.random.choice(np.arange(11, 270600), size=iterations, replace=False)
+        unique_seeds = np.random.choice(np.arange(1, 270600), size=iterations, replace=False)
         for i, seed in enumerate(unique_seeds):
             data = prepare_data.PrepareData(gene_name, all_features, seed) #Get data object with train/test splits for given seed
             print('\n*** Running ', modeling_approach,'***')
-            run = run_models.RunModels(modeling_approach, data, what_to_run, seed) 
+            run = run_models.RunModels(modeling_approach, data, what_to_run, seed, n_iter=10) 
             evaluate = evaluate_models.EvaluateModels(modeling_approach, data, run.best_model, seed) #Evaluate best_model obtained from cross validation
             #print(evaluate.results_dict)
             results_dict_list.append(evaluate.results_dict)
@@ -88,11 +88,9 @@ class RunStudy:
             
         
 
-RunStudy('KCNQ1', 'rand_search', 'RandomForest', iterations=20)
+# RunStudy('KCNQ1', 'rand_search', 'RandomForest', iterations=20)
 # RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
-# RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
-
-
+# # RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
 
 
 
