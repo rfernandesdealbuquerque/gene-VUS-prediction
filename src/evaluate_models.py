@@ -41,7 +41,7 @@ class EvaluateModels(object):
             self._evaluate_random_forest()
 
         elif modeling_approach == 'GradientBoosting':
-            self._evaluate_random_forest()        
+            self._evaluate_gradient_boosting()        
     
     def _evaluate_lr(self):
         #this is the auc performance of the model with the best parameters trained on the whole training set.
@@ -81,19 +81,30 @@ class EvaluateModels(object):
         # print('RandomForest Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
 
         self.results_dict = {'Seed': self.seed,
+                            'Best K-fold AUC': self.best_model.best_score_,
+                            'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
+                            'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
+                            'n_estimators': self.best_model.best_params_['n_estimators'],
+                            'bootstrap': self.best_model.best_params_['bootstrap'],
+                            'max_depth': self.best_model.best_params_['max_depth'],
+                            'max_features': self.best_model.best_params_['max_features'],
+                            'min_samples_leaf': self.best_model.best_params_['min_samples_leaf'],
+                            'min_samples_split': self.best_model.best_params_['min_samples_split']}
+
+    def _evaluate_gradient_boosting(self):
+        # #this is the auc performance of the model with the best parameters trained on the whole training set.
+        # print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
+        # print('GradientBoosting Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
+
+        self.results_dict = {'Seed': self.seed,
                              'Best K-fold AUC': self.best_model.best_score_,
                              'Train AUC': self.best_model.score(self.data.X_train, self.data.y_train),
                              'Test AUC': self.best_model.score(self.data.X_test, self.data.y_test),
-                             'bootstrap': self.best_model.best_params_['bootstrap'],
+                             'n_estimators': self.best_model.best_params_['n_estimators'],
+                             'learning_rate': self.best_model.best_params_['learning_rate'],
                              'max_depth': self.best_model.best_params_['max_depth'],
-                             'max_features': self.best_model.best_params_['max_features'],
+                             'subsample': self.best_model.best_params_['subsample'],
                              'min_samples_leaf': self.best_model.best_params_['min_samples_leaf'],
                              'min_samples_split': self.best_model.best_params_['min_samples_split'],
-                             'n_estimators': self.best_model.best_params_['n_estimators']}
-        
-    def _evaluate_gradient_boosting(self):
-        #this is the auc performance of the model with the best parameters trained on the whole training set.
-        print('GradientBoosting Train: ', self.best_model.score(self.data.X_train, self.data.y_train)) # this is the performance on the whole training set.
-        print('GradientBoosting Test: ', self.best_model.score(self.data.X_test, self.data.y_test)) # this is the performance on the test set.
-
+                        }
         

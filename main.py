@@ -40,7 +40,7 @@ class RunStudy:
         for i, seed in enumerate(unique_seeds):
             data = prepare_data.PrepareData(gene_name, all_features, seed) #Get data object with train/test splits for given seed
             print('\n*** Running ', modeling_approach,'***')
-            run = run_models.RunModels(modeling_approach, data, what_to_run, seed, n_iter=10) 
+            run = run_models.RunModels(modeling_approach, data, what_to_run, seed, n_iter=20) 
             evaluate = evaluate_models.EvaluateModels(modeling_approach, data, run.best_model, seed) #Evaluate best_model obtained from cross validation
             #print(evaluate.results_dict)
             results_dict_list.append(evaluate.results_dict)
@@ -84,13 +84,16 @@ class RunStudy:
             self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.           
 
         elif modeling_approach == 'GradientBoosting':
-            pass
+            self.best_model = GradientBoostingClassifier(
+                n_estimators=int(best_hyperparameters.at[0,'n_estimators']),
+                learning_rate=best_hyperparameters.at[0,'learning_rate'],
+                max_depth=int(best_hyperparameters.at[0,'max_depth']),
+                min_samples_leaf=int(best_hyperparameters.at[0,'min_samples_leaf']),
+                min_samples_split=int(best_hyperparameters.at[0,'min_samples_split']),
+                subsample=(best_hyperparameters.at[0,'subsample'])
+            )
+            self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.  
             
-        
-
-# RunStudy('KCNQ1', 'rand_search', 'RandomForest', iterations=20)
-# RunStudy('MYH7', 'grid_search', 'LR', iterations=100)
-# # RunStudy('RYR2', 'grid_search', 'LR', iterations=100)
 
 
 

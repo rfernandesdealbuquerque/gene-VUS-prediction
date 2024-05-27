@@ -16,12 +16,9 @@ class RunModels(object):
     <modeling_approach>: a string, either 'MLP' or 'LR' (for logistic regression)
     <results_dir>: path to directory to save results
     <real_data_split>: data split defined in clean_data.py PrepareData class
-    <what_to_run>: a string, either 'grid_search' (to perform grid search
-        over many predefined model setups) or 'test_pred' (after a grid search
-        is complete this will select the best model and then save the test set
-        predictions of that model for use in e.g. visualization functions)
-    <testing>: if True, and if <what_to_run>=='grid_search' then only run
-        on a small number of possible settings (for code testing purposes)
+    <what_to_run>: a string, either 'grid_search' to perform grid search
+        over all predefined model setups or 'rand_search' to perform randomized search
+        and run cross validation across n_iter model setups.
     
     To run without ensembling, i.e. to run each architecture/hyperparameter
     grouping on only one instantiation of the model, set ensemble=[1]"""
@@ -141,11 +138,13 @@ class RunModels(object):
     def _initialize_grid_search_params_gradient_boosting(self):
         """Initialize lists of hyperparameters to assess"""
         # Define hyperparameters grid for grid search
-        self.param_grid = { 'max_depth': [10, 20, None],
-                            'max_features': ['sqrt'],
-                            'min_samples_leaf': [1, 2],
-                            'min_samples_split': [2, 5],
-                            'n_estimators': [200, 400]}
+        self.param_grid = { 'n_estimators': [50, 100, 200],  # Number of trees
+                            'learning_rate': [0.05, 0.1, 0.15, 0.2],  # Learning rate
+                            'max_depth': [3, 4, 5, 6],  # Maximum depth of trees
+                            'min_samples_split': [2, 5, 10],  # Minimum samples required to split a node
+                            'min_samples_leaf': [1, 2, 5, 10],  # Minimum samples required at a leaf node
+                            'subsample': [0.6, 0.7, 0.8, 0.9]  # Subsample ratio
+        }
     
     def _run_gradient_boosting_grid_search(self):
         """Run grid search with gradient boosting model for each combination of hyperparameters"""
@@ -163,7 +162,7 @@ class RunModels(object):
 
     # Randomized Search Method #------------------------------------------------------
     def _run_rand_search(self):
-        """Perform a grid search across predefined architectures and
+        """Perform a randomized search across predefined architectures and
         hyperparameters for a given gene <gene_name> to determine the best
         model setup for the given modeling approach."""
             
@@ -259,11 +258,13 @@ class RunModels(object):
     def _initialize_rand_search_params_gradient_boosting(self):
         """Initialize lists of hyperparameters to assess"""
         # Define hyperparameters grid for RandomizedSearch
-        self.param_grid = { 'max_depth': [10, 20, None],
-                            'max_features': ['auto', 'sqrt'],
-                            'min_samples_leaf': [1, 2],
-                            'min_samples_split': [2, 5],
-                            'n_estimators': [200, 400]}
+        self.param_grid = { 'n_estimators': [50, 100, 200],  # Number of trees
+                            'learning_rate': [0.05, 0.1, 0.15, 0.2],  # Learning rate
+                            'max_depth': [3, 4, 5, 6],  # Maximum depth of trees
+                            'min_samples_split': [2, 5, 10],  # Minimum samples required to split a node
+                            'min_samples_leaf': [1, 2, 5, 10],  # Minimum samples required at a leaf node
+                            'subsample': [0.6, 0.7, 0.8, 0.9]  # Subsample ratio
+        }
     
     def _run_gradient_boosting_rand_search(self):
         """Run grid search with gradient boosting model for each combination of hyperparameters"""

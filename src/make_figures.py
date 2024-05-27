@@ -53,19 +53,19 @@ class MakeFigures:
         best_hyperparameters_text = ''
         num_columns = len(self.best_hyperparameters.columns)
         for i in range(0, num_columns):
-            if i == num_columns - 2:
-                best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]*100} %' + '\n'
+            if i == num_columns - 3:
+                best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i].round(2)*100} %' + '\n'
             else:
                 best_hyperparameters_text = best_hyperparameters_text + f'{self.best_hyperparameters.columns[i]}: {self.best_hyperparameters.iat[0,i]}' + '\n'
         print(best_hyperparameters_text)
-        plt.text(0.65, 0.18, best_hyperparameters_text)
+        plt.text(0.60, 0.1, best_hyperparameters_text)
         plt.plot([0, 1], [0, 1], color=self.neutral_color, lw=self.lw, linestyle=self.neutral_linestyle) #diagonal line
         plt.xlim([0.0, 1.0])
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title(f'{self.gene_name} - ROC of Median Model - {self.modeling_approach}')
-        plt.legend([line], [f'{self.modeling_approach}, AUC=%0.4f' % roc_auc,], loc='lower right')
+        plt.title(f'{self.gene_name} - ROC Curve of Final Model - {self.modeling_approach}')
+        plt.legend([line], [f'AUC=%0.4f' % roc_auc,], loc='lower right')
         plt.savefig(os.path.join(self.save_dir, self.gene_name+f'_Median_Model_{self.modeling_approach}_ROC_Curve.jpg'))
         plt.close()
 
@@ -77,4 +77,4 @@ class MakeFigures:
         sns.histplot(data=results_df, x='Test AUC')
         plt.xlabel('Test AUC')
         plt.title(f'{self.gene_name} - AUC for {len(results_df)} Different Random Seeds - {self.modeling_approach}')
-        plt.savefig(os.path.join(self.save_dir, self.gene_name+'_Performance_Hist.jpg'))
+        plt.savefig(os.path.join(self.save_dir, self.gene_name+f'_Performance_Hist_{self.modeling_approach}.jpg'))
