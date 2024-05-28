@@ -94,6 +94,18 @@ class RunStudy:
             )
             self.data_median_model = prepare_data.PrepareData(self.gene_name, all_features, seed_median_model) #Here we use the seed that produced the median model to split the data. Then, we fit the final model to this data using the best hyperparameter group.  
             
+RunStudy('KCNQ1', 'grid_search', 'LR', iterations=1000)
+RunStudy('MYH7', 'grid_search', 'LR', iterations=1000)
+RunStudy('RYR2', 'grid_search', 'LR', iterations=1000)
 
+RunStudy('KCNQ1', 'grid_search', 'DecisionTree', iterations=1000)
+RunStudy('MYH7', 'grid_search', 'DecisionTree', iterations=1000)
+RunStudy('RYR2', 'grid_search', 'DecisionTree', iterations=1000)
 
+RunStudy('KCNQ1', 'rand_search', 'RandomForest', iterations=1000)
+RunStudy('MYH7', 'rand_search', 'RandomForest', iterations=1000)
+RunStudy('RYR2', 'rand_search', 'RandomForest', iterations=1000)
 
+RunStudy('KCNQ1', 'rand_search', 'GradientBoosting', iterations=1000)
+RunStudy('MYH7', 'rand_search', 'GradientBoosting', iterations=1000)
+RunStudy('RYR2', 'rand_search', 'GradientBoosting', iterations=1000)
